@@ -10,6 +10,10 @@ var ProductosSchema = Schema({
    sabor: String,
    kg: Number,
    precio: Number,
+   stock: {
+      type: Number,
+      default: 0
+   },
    imagen: String,
 });
 module.exports = mongoose.model('Productos', ProductosSchema);

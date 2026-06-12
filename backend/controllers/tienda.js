@@ -15,10 +15,22 @@ var controller = {
     // ========== PRODUCTOS ==========
     saveProducto: function (req, res) {
         var producto = new Productos();
-        var params = req.body;
+        var params = req.body || {};
 
-        if (!params.nombre || params.precio === undefined || params.precio === null || params.precio === '') {
-            return res.status(400).send({ message: 'Falta el nombre o el precio del producto' });
+        var camposFaltantesProducto = [];
+
+        if (!params.nombre) camposFaltantesProducto.push('nombre');
+        if (!params.animal) camposFaltantesProducto.push('animal');
+        if (!params.sabor) camposFaltantesProducto.push('sabor');
+        if (params.kg === undefined || params.kg === null || params.kg === '') camposFaltantesProducto.push('kg');
+        if (params.precio === undefined || params.precio === null || params.precio === '') camposFaltantesProducto.push('precio');
+        if (params.stock === undefined || params.stock === null || params.stock === '') camposFaltantesProducto.push('stock');
+
+        if (camposFaltantesProducto.length > 0) {
+            return res.status(400).send({
+                message: 'Debes llenar todos los parámetros obligatorios para guardar el producto',
+                camposFaltantes: camposFaltantesProducto
+            });
         }
 
         producto.nombre = params.nombre;
@@ -26,6 +38,7 @@ var controller = {
         producto.sabor = params.sabor;
         producto.kg = params.kg;
         producto.precio = params.precio;
+        producto.stock = params.stock;
         producto.imagen = null;
 
         producto.save()
@@ -103,12 +116,28 @@ var controller = {
     // ========== ACCESORIOS ==========
     saveAccesorio: function (req, res) {
         var accesorio = new Accesorios();
-        var params = req.body;
+        var params = req.body || {};
+
+        var camposFaltantesAccesorio = [];
+
+        if (!params.nombre) camposFaltantesAccesorio.push('nombre');
+        if (!params.categoria) camposFaltantesAccesorio.push('categoria');
+        if (!params.tipo) camposFaltantesAccesorio.push('tipo');
+        if (params.precio === undefined || params.precio === null || params.precio === '') camposFaltantesAccesorio.push('precio');
+        if (params.stock === undefined || params.stock === null || params.stock === '') camposFaltantesAccesorio.push('stock');
+
+        if (camposFaltantesAccesorio.length > 0) {
+            return res.status(400).send({
+                message: 'Debes llenar todos los parámetros obligatorios para guardar el accesorio',
+                camposFaltantes: camposFaltantesAccesorio
+            });
+        }
 
         accesorio.nombre = params.nombre;
         accesorio.categoria = params.categoria;
         accesorio.tipo = params.tipo;
         accesorio.precio = params.precio;
+        accesorio.stock = params.stock;
         accesorio.imagen = null;
 
         accesorio.save()
@@ -199,6 +228,15 @@ var controller = {
             .then(item => {
                 if (!item) return res.status(404).send({ message: 'Item no encontrado' });
 
+                var currentStock = Number(item.stock || 0);
+                if (currentStock < qty) {
+                    return res.status(409).send({
+                        message: 'No hay stock suficiente para agregar este item al carrito',
+                        stockDisponible: currentStock,
+                        qtySolicitada: qty
+                    });
+                }
+
                 // devolver información útil para que el cliente la sincronice en localStorage
                 return res.status(200).send({
                     success: true,
@@ -208,6 +246,7 @@ var controller = {
                         kind: kind,
                         nombre: item.nombre,
                         precio: item.precio,
+                        stock: item.stock,
                         imagen: item.imagen || null,
                         qty: qty
                     }

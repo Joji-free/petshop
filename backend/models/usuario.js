@@ -58,7 +58,7 @@ const UsuarioSchema = Schema({
     /**
      * Rol del usuario en el sistema
      * - Default: 'user' (cliente)
-     * - Valores permitidos: 'user', 'admin'
+    * - Valores permitidos: 'user', 'admin'
      * - Los admins tienen acceso al panel de administración
      */
     rol: { 

@@ -40,11 +40,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'mi_clave_secreta_super_segura_2024
  * - 401: Token no proporcionado o inválido/expirado
  */
 function verifyToken(req, res, next) {
-    // Extraer token del header: "Bearer TOKEN" -> TOKEN
+    // Extraer token desde múltiples fuentes para mayor compatibilidad
     const authHeader = req.headers['authorization'];
-    const token = authHeader?.split(' ')[1];
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    const rawAuthToken = authHeader && !authHeader.startsWith('Bearer ') ? authHeader : null;
+    const xAccessToken = req.headers['x-access-token'];
+    const queryToken = req.query?.token;
+    const bodyToken = req.body?.token;
+    const token = bearerToken || rawAuthToken || xAccessToken || queryToken || bodyToken;
 
     if (!token) {
+        console.warn(`[AUTH] Token faltante en ${req.method} ${req.originalUrl}`);
         return res.status(401).json({ 
             message: 'No se proporcionó token de autenticación' 
         });
@@ -94,7 +100,7 @@ function verifyAdmin(req, res, next) {
         });
     }
 
-    // Verificar que el rol sea 'admin'
+    // Verificar que el rol tenga permisos administrativos
     if (req.user.rol !== 'admin') {
         return res.status(403).json({ 
             message: 'No tienes permisos de administrador' 

@@ -474,7 +474,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 **Proceso**:
 1. Verificar que `req.user` exista
-2. Verificar que `req.user.rol === 'admin'`
+2. Verificar que `req.user.rol` sea `'admin'`
 3. Llamar `next()`
 
 **Errores**:
@@ -892,8 +892,6 @@ node create-admin.js
 # Credenciales: admin@petshop.com / admin123
 ```
 
----
-
 ### Checklist Pre-Producción
 
 - Cambiar JWT_SECRET a valor seguro y aleatorio  
@@ -967,17 +965,17 @@ proyecto/src/app/
 
 ### Productos
 - `GET /productos` - Listar todos
-- `POST /guardar-productos` - Crear nuevo
+- `POST /guardar-productos` [PROTEGIDO] - Crear nuevo
 - `GET /producto/:id` - Obtener uno
-- `PUT /producto/:id` - Actualizar
-- `DELETE /producto/:id` - Eliminar
+- `PUT /producto/:id` [PROTEGIDO] - Actualizar (incluye stock)
+- `DELETE /producto/:id` [PROTEGIDO] - Eliminar
 
 ### Accesorios
 - `GET /accesorios` - Listar todos
-- `POST /guardar-accesorios` - Crear nuevo
+- `POST /guardar-accesorios` [PROTEGIDO] - Crear nuevo
 - `GET /accesorio/:id` - Obtener uno
-- `PUT /accesorio/:id` - Actualizar
-- `DELETE /accesorio/:id` - Eliminar
+- `PUT /accesorio/:id` [PROTEGIDO] - Actualizar (incluye stock)
+- `DELETE /accesorio/:id` [PROTEGIDO] - Eliminar
 
 ### Carrito
 - `POST /cart/add` - Agregar item
